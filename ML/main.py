@@ -39,7 +39,7 @@ def extract_data_from_file(file, num_rows):
 
 def convert_to_float(arr):
     lb = LabelEncoder()
-    for x in arr:
+    for x in arr[1:]:
         x = lb.fit_transform(x)
     return arr
 
@@ -49,9 +49,9 @@ def extract_data(FILE, num_rows):
     file = pd.read_csv(FILE)
     lb = LabelEncoder()
 
-    data_features = convert_to_float(file.iloc[:, :-1].T)  # all but last column
+    data_features = convert_to_float(file.iloc[:, :-1])  # all but last column
 
-    data_labels = convert_to_float(file.iloc[:, -1].T)
+    data_labels = convert_to_float(file.iloc[:, -1])
 
     data_labels = lb.fit_transform(data_labels)
 
