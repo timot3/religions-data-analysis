@@ -39,8 +39,14 @@ def extract_data_from_file(file, num_rows):
 
 def convert_to_float(arr):
     lb = LabelEncoder()
-    for x in arr[1:]:
-        x = lb.fit_transform(x)
+    for x in arr:
+        arr[x] = lb.fit_transform(list(arr[x]))
+    return arr
+
+
+def convert_labels_to_float(arr):
+    lb = LabelEncoder()
+    arr = lb.fit_transform(list(arr))
     return arr
 
 
@@ -48,12 +54,12 @@ def extract_data(FILE, num_rows):
     list_data = []
     file = pd.read_csv(FILE)
     lb = LabelEncoder()
-
+    # print(file.iloc[:, :-1])
     data_features = convert_to_float(file.iloc[:, :-1])  # all but last column
 
-    data_labels = convert_to_float(file.iloc[:, -1])
+    data_labels = convert_labels_to_float(file.iloc[:, -1])
 
-    data_labels = lb.fit_transform(data_labels)
+    # data_labels = lb.fit_transform(data_labels)
 
     '''labels = raw_data[:, -1]
     features = raw_data[:, :-1]'''
@@ -61,26 +67,25 @@ def extract_data(FILE, num_rows):
 
     '''
     line = fin.readline()
-        counter = 1
-        while line:
-            try:
-                temp = line.split(',')[2:]
-                #                temp[-1] = temp[-1][:-1]
-                list_data.append(list(map(float, temp)))  # convert string to float
-            except:
-                counter = counter
-            #            if counter % 1000 == 0:
-            #                print("%.2f%% Finished" % (counter / num_rows * 100))
-
-            line = fin.readline()
-            counter += 1
-    raw_data = as_tensor(list_data).float()
-    print(raw_data.shape)
-    labels = raw_data[:, -1]
-    features = raw_data[:, :-1]
+            counter = 1
+            while line:
+                try:
+                    temp = line.split(',')[2:]
+                    #                temp[-1] = temp[-1][:-1]
+                    list_data.append(list(map(float, temp)))  # convert string to float
+                except:
+                    counter = counter
+                #            if counter % 1000 == 0:
+                #                print("%.2f%% Finished" % (counter / num_rows * 100))
     
+                line = fin.readline()
+                counter += 1
+        raw_data = as_tensor(list_data).float()
+        print(raw_data.shape)
+        labels = raw_data[:, -1]
+        features = raw_data[:, :-1]
+        
         return labels, features
-
     '''
 
 
@@ -93,7 +98,7 @@ NUM_ROWS = 1393
 TRAIN_VALIDATION_SPLIT = 0.95
 
 
-np.random.seed(3)  # to produce a similar output
+# np.random.seed(3)  # to produce a similar output
 
 
 def RMSE(x, y):
