@@ -17,5 +17,14 @@ class Classifier:
         self.preprocess()
         model.fit(self.X, self.y_hat)
         train_validation_split = 0.95
-        print(model.score(self.X[int(len(self.X) * train_validation_split):],
+        print("Model Accuracy: ")
+        print(100 * model.score(self.X[int(len(self.X) * train_validation_split):],
                           self.y_hat[int(len(self.y_hat) * train_validation_split):]))
+
+    #
+    # def eval(self, categories):
+    #     if len(categories) > 9:
+    #         print("Too many items!")
+
+        # voted_for_in_2012_election,political_spectrum,social_class,gender,citizenship,living_location,sexuality,income,education,reltrad
+

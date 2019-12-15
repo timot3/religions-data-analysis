@@ -1,7 +1,10 @@
 # Written mostly by Justin Wang for a hackathon we did together (https://github.com/timot3/PYGHACK).
 # I modified some lines to make it more relevant to the current problem.
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
+import seaborn as sb
 
 import numpy as np
 import math
@@ -49,38 +52,55 @@ TRAIN_VALIDATION_SPLIT = 0.95
 # np.random.seed(3)  # to produce a similar output
 
 
-def RMSE(x, y):
-    acc = 0
-    for i in range(len(x)):
-        acc = acc + (x[i] - y[i]) ** 2
-    return math.sqrt(acc / len(x))
-
-
 print("Loading in Data")
 file = get_table(DATA_FILE)
 labels, features = extract_data(file, NUM_ROWS)
-# perm = np.random.permutation(len(labels))
-# features = features[perm].numpy()
-# labels = labels[perm].numpy()
-#
-# xtrain = features[:int(len(features) * TRAIN_VALIDATION_SPLIT), :]
-# ytrain = labels[:int(len(features) * TRAIN_VALIDATION_SPLIT)]
-#
-# xval = features[int(len(features) * TRAIN_VALIDATION_SPLIT):, :]
 
-clf = RandomForestRegressor(n_estimators=50, )
+clf = RandomForestClassifier(n_estimators=25, )
 
-clf.fit(features, labels)
+clf.fit(features[:int(len(features) * TRAIN_VALIDATION_SPLIT)], labels[:int(len(labels) * TRAIN_VALIDATION_SPLIT)])
 
+
+acc = 100 * clf.score(features[int(len(features) * TRAIN_VALIDATION_SPLIT):],
+                      labels[int(len(labels) * TRAIN_VALIDATION_SPLIT):])
+
+print("Forest accuracy: \n" + str(acc))
 print(*(clf.feature_importances_ * 100))
 
-# y_pred = clf.predict(xval)
+# categorical_classifier = bc.Classifier(features, labels)
+# categorical_classifier.train()  # outputs training accuracy, also trains classifier
 
-# acc = RMSE(y_pred, yval)
 
-# print("Model Accuracy: ", acc)
+# plt.bar(reltrad.keys(), reltrad.values(), label="Count")
+'''
+plt.ylabel('Count')
+plt.xlabel('Religion')
+plt.title("Frequency of Religion in Baylor 2014 Survey")
+plt.xticks(list(reltrad.keys()))
+plt.legend(bbox_to_anchor=(1, 1), loc="upper right", borderaxespad=0.)
+pylab.xticks(rotation=-60)
 
-eval_data = labels[int(len(features) * TRAIN_VALIDATION_SPLIT):]
+plt.show()
+'''
+rows = list(file.columns)
 
-categorical_classifier = bc.Classifier(features, labels)
-categorical_classifier.train()
+rows = [w.replace('_', ' ') for w in rows]
+
+print(rows)
+importance = clf.feature_importances_
+importance = pd.DataFrame(importance, index=file.columns[:-1],
+                          columns=["Importance"])
+
+importance["Std"] = np.std([tree.feature_importances_
+                            for tree in clf.estimators_], axis=0)
+
+y = importance.ix[:, 0]
+yerr = importance.ix[:, 1]
+
+plt.bar(rows[:-1], y, yerr=yerr, align="center")
+pylab.xticks(rotation=-60)
+plt.title("Feature Importance When Predicting Social Status")
+plt.ylabel("Importance Percentage")
+plt.show()
+
+
